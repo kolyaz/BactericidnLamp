@@ -1,0 +1,696 @@
+/////////////////////////////////////////////////////////////////////////////////////////////
+//
+//
+//  Глобальные переменные и функции
+//
+//
+////////////////////////////////////////////////////////////////////////////////////////////
+#include <mbed.h>
+#include "QEI.h"
+#include "TextLCD.h"
+#include "RPG.h"
+
+
+
+
+#include "fun.h"
+#include  "lamp.cpp"
+
+
+
+
+
+QEI wheel (PB_6,PB_7,PC_13, 24); //(pinA, pinB, button, countobor)
+RPG wheelRPG (PB_6,PB_7,PC_13);
+I2C i2c_lcd( I2C_SDA,I2C_SCL); // I2C_SDA, I2C_SCL
+TextLCD_I2C lcd(&i2c_lcd, 0x4E, TextLCD_I2C::LCD16x2,TextLCD::HD44780);
+
+Lamp lamp1;
+Lamp lamp2;
+Lamp lamp3;
+Lamp lamp4;
+Lamp lamp5;
+Lamp lamp6;
+Lamp lamp7;
+Lamp lamp8;
+Lamp lamp9;
+Lamp lamp10;
+Lamp lamp11;
+Lamp lamp12;
+Lamp lamp13;
+Lamp lamp14;
+Lamp lamp15;
+Lamp lamp16;
+Lamp lamp17;
+Lamp lamp18;
+Lamp lamp19;
+Lamp lamp20;
+Lamp lamp21;
+Lamp lamp22;
+Lamp lamp23;
+Lamp lamp24;
+
+
+
+//
+//---переменые энкодера для использования в программе----
+uint16_t    rotate;                             //количество проворотов энкодера    
+bool        button;                             //нажатие на кнопку (импульс)   
+int         countB;                             //количество нажатий на кнопку           
+bool        ChangeRotate;                       //фиксирование поворота энкодера
+
+//---переменные для экрана и уровней----
+bool LightDisp;
+bool Level1Back;                                //возврат уровня            
+int Level;
+int NMenuL1;                                    //на какую строку уровня 1 будет преход
+int NMenuL2;                                    //на какую строку уровня 2 будет преход
+int ActMenuL2;                                  //на какой строке уровня 2 будет изменяться параметр
+int NMenuL2_1;                                  //на какую строку подуровня 2_1 будет преход
+int NMenuL2_2;                                  //на какую строку подуровня 2_2 будет преход
+int8_t backL2_1;                                //возврат на уровень 2_1
+int DispLightTime;                              //Время работы подсветки после бездействия
+bool TikTimeD;
+int TimeOldD;
+
+//---Переменные для таймера---
+Timer t;                                        //вызов таймера                
+int SecSystem;                                  //системные секунды        
+int SecSystemOld;
+int Sec;
+int Min;
+int Hour;
+bool TikTimeR;                                     //Счетчик Ресурсного временного промежутка 
+int TimeOldR;                                      //сравнение с прошедшим значением Ресурсного времени
+
+//Включение/выключение установки
+bool OnOff;                                      //Состояние системы Вкл/Выкл               
+bool OnOffold;                                   //Значение состояния системы предыдущего цикла  
+int CountOnOff;                                  //количество включений установки
+bool ResCountOnOff;                              //Сброс количества включений системы   
+  
+
+
+//---Ресурсное время работы 
+int Resurs_Time_St;                              //Ресурсное время, выставленное 
+int Resurs_Time_Set;                             //Ручное выставление ресурсного времени 
+bool OnOffRes;                                   //Сокращение ресурса при вкл/выключении 
+int KoefOnOffRes=3;                              //Коэффициент, который отвечет за снижение ресурса лампы от количества включений/выключений   
+ 
+int L1Resurs_St;                                 //Ресурсное время лампы 1   
+int L1Resurs_Set;                                //Ручное выставление ресурсного вермени лампы 1   
+int L1Resusr_Res;                                //Сброс отработанного времени на выставленное лампы 1 
+int L1Resusr_OSt;                                //оставшееся время ресурса лампы 1
+
+int L2Resurs_St;                                 //Ресурсное время лампы 2   
+int L2Resurs_Set;                                //Ручное выставление ресурсного вермени лампы 2   
+int L2Resusr_Res;                                //Сброс отработанного времени на выставленное лампы 2 
+int L2Resusr_OSt;                                //оставшееся время ресурса лампы 2
+
+
+
+//----Alarm----///
+bool L1_Alarm;                                   //предупреждение об окончании ресурса лампы 1
+int L1_AlarmT;                                   //Остаток времени, меньше которого появится предупреждение  
+
+
+       
+
+        //////////////////////////////////////Функции////////////////////////////////////////
+
+//-------------------------------------------------------------------Функция чтения циклического значения в определенных пределах
+int8_t CiclZnach (int8_t UpPredel, int8_t DnPredel, int16_t rotateCZ)       
+{
+           // printf("rotateCZ %i\n", rotateCZ);
+           // printf("UpPredel %i\n", UpPredel);
+    if  ((rotateCZ > UpPredel) or (rotateCZ < DnPredel))
+        {
+           wheel.reset();
+           return 0;
+        }
+           return rotateCZ;
+}
+//------------------------------------------------------------------
+
+
+//------------------------------------------------------------------Функция для формирования импульса для различных промежутком времени
+bool TikTime (int TimePrOld, int TimePr)                                   
+{
+        //printf("rotateCZ %i\n", TimePrOld);
+        //printf("UpPredel %i\n", TimePr);
+        if (TimePrOld != TimePr)
+            {
+               //TimePrOld = TimePr;
+               return true; 
+            }
+               return false; 
+}
+//--------------------------------------------------------------------
+
+
+//--------------------------------------------------------------------Счетчик времени
+void TimerObsh (int TimerSec,Timer &t)              
+{
+    if (LightDisp)                                  //Условие включения счетчика (планируется активация при включении установки). 
+                                                    //Сейчас сделано включение при активации подсветки при любом изменении энкодера.
+        {
+            SecSystem = (int)t.read();              //Чтение системного вермени. Библиотека "Timer"    
+                if (SecSystemOld != SecSystem)      //
+                {
+                        //------Секунды------//
+                    Sec ++; 
+                        if (Sec==60)
+                        {  
+                            Sec = 0;
+                            Min ++;
+                        }
+                                //----Минуты----//
+                        if  (Min == 60)
+                        {  
+                            Min = 0;
+                            Hour ++;
+                        }
+                                //----Часы----//
+                        if  (Hour == 24)
+                        {  
+                            Hour = 0;
+                        }
+                }   
+            SecSystemOld = SecSystem; 
+        }        
+}
+//--------------------------------------------------------------------
+
+
+//--------------------------------------------------------------------Исключение дребезка энкодера. включение/выключение подсветки экрана
+void drebezg_encoder (int dredezg)              
+
+{
+    wait_ms(dredezg);                                                 //испрльзование задержки для исключения дребезга      
+    uint16_t    rotateNew=wheel.getPulses();                          //Чтенеие поворотов энкодера. библиотека OEI  
+    bool        buttonRPG=wheelRPG.pb();                              //Чтение "кнопочного" сигнала энкодера. библиотека RPG  
+        ChangeRotate = (rotate!=rotateNew) ? true : false;            //Чтение поворота энкодера без проскальзывания
+        if (rotate!=rotateNew or button)                              //Условие включения подсветки дисплея  
+        {   
+               //lcd.cls();
+               //здесь должна быть подсветка экрана, выключаемая через определенное время и переменная подсветки экрана, например LightDisp 
+               LightDisp = true;                                        
+               DispLightTime = 20;                                     //Через 20 сек дисплей погаснет и вернется на главный экран 
+        }
+            else 
+            {
+                TikTimeD = TikTime (TimeOldD, Sec);                    //Функция для отчета времени с момента НЕактивности энкодера
+                if (TikTimeD)
+                    {
+                        if (DispLightTime > 0)
+                        {
+                            DispLightTime--;
+                        } 
+                            else
+                            {
+                               LightDisp = false;
+                               lcd.cls();
+                               Level=0;
+                               countB = 0;
+                               wheel.reset();
+                            }
+                    }
+                TimeOldD = Sec;
+                
+            }
+            
+
+        rotate=rotateNew;                                              //Поворот энкодера. Значение переменной, которое будет использоваться в программе 
+        
+
+        if (buttonRPG)                                                 //Условие чтения импульсного значения для переменной button, которая будет использоваться в программе
+        {
+            button = true;                                              
+            countB++;                                                  //Количество нажатий на кнопку 
+            lcd.cls();                                                 //Очистка экрана
+            printf("нажатий: %i\n", NMenuL2);       
+            printf("Дисплей: %i\n", LightDisp);       
+            printf("Кнопка: %i\n", button);
+            printf("Поворот: %i\n", rotate);  
+        }
+            else
+            {
+                button = false;
+            }
+          
+}
+//------------------------------------------------------------------------
+
+void ResursT (int ResursTime)                   // Ресурсное время работы установки в целом и каждой лампы в отдельности   
+{
+   printf("OnOff %i\n", OnOffint);
+   if (OnOff)                                                                          //Когда установка включается, от ресурса отнимается время от включения, а затем уже идет                                                                                                
+   {                                                                                   //стандартный ресурс (почасовой)
+        if (!OnOffRes)                                                                 //импульс включения и вычета коэффициента от ресурса                 
+            {
+              (L1Resusr_OSt > 0) ? L1Resusr_OSt = L1Resusr_OSt - KoefOnOffRes: L1Resusr_OSt = L1Resusr_OSt;
+              (L2Resusr_OSt > 0) ? L2Resusr_OSt = L2Resusr_OSt - KoefOnOffRes: L2Resusr_OSt = L2Resusr_OSt;
+              OnOffRes = true;  
+            }
+            else 
+                {
+                TikTimeR = TikTime (TimeOldR, Sec);
+                
+                if (TikTimeR)
+                    {
+                        (L1Resusr_OSt > 0) ? L1Resusr_OSt--: L1Resusr_OSt = L1Resusr_OSt;       //Уменьшение ресурса по времени для лампы 1
+                        (L2Resusr_OSt > 0) ? L2Resusr_OSt--: L2Resusr_OSt = L2Resusr_OSt;       //Уменьшение ресурса по времени для лампы 2
+                    }
+                TimeOldR = Sec;
+                 }
+
+    }
+        else
+        {
+           OnOffRes = false;
+        }
+}
+
+void LevelChoice (int LevelUD)                  //переход по уровням меню. 0 - отображение общего ресурса и остаточного ресурса, 1 - выбор лампы с остаточным ресурсом, 2 - настройки для каждого параметра.
+{   
+    wait_ms(LevelUD);
+    if (LightDisp and button and (Level == 0))  //Условие, при котором, при нажатии на кнопку будет переход на уровень 1
+    {
+        //lcd.cls();
+        Level = 1;                              //меню выбора параметра для редактирования (Lamp1....)
+        wheel.reset();                          //Сброс количества оборотов энкодера
+        rotate = 0;                             //Обнуление оборотов переменной во всей программе
+    }   
+        else if (button and (Level == 1) and !Level1Back)   //Условие пререхода на второй уровень (Начальнй ресурс ламп, сброс остаточного ресурса к начальному, возврат на предыдущее меню)
+    {
+        //lcd.cls();
+        Level = 2;                              //вход в один из параметров
+        NMenuL2 = NMenuL2 + rotate;             //переход на выбранную строку меню
+        wheel.reset();
+        rotate = 0;
+        countB = 0;                             //сброс количества нажатий на кнопку, в программе
+    }
+       // else if (button and (Level == 2))      //Запасной уровень
+    //{
+        //  Level = 3;
+        // wheel.reset();
+    //}
+    //printf("Уровень: %i\n", Level);
+}
+
+
+void On_OffSystem(int On_OffCount)                  //Включение/выключение установки
+{
+    if  (rotate == 10)
+        {
+            OnOffint = 1;                           ////////УДАЛИТЬ, для теста    
+            OnOff = true;
+            CountOnOff++;
+        }
+        else if (rotate == 11)
+        {
+            OnOff = false;
+            //OnOffint = 0;                          ////////УДАЛИТЬ, для теста    
+        }
+        else if ((button) and (rotate == 12))
+        {
+            //OnOffint = 0;                          ////////УДАЛИТЬ, для теста 
+            OnOff = false;
+            CountOnOff=0; 
+        }
+}
+
+void Level0(int Level0Tout)                     //Начальный экран (отображение общего начального ресурса установки, общего оставшегося ресурса)
+    {
+        if (Level==0)
+            {
+                lcd.printf("Obsh T: %i:%i\n", Sec, Min);            //ВЫВЕДЕНЫ ДЛЯ ТЕСТИРОВАНИЯ
+                lcd.printf("Work T: %i\n", Min);
+                printf("Rotate: %i\n", rotate);
+            }
+    }
+
+void Level1(int Level1Tout)                     //перемещение в 1 уровне. выбор изменяемого параметра и значние оставшегося ресурса.
+    {
+        if (Level==1)
+            {
+                if (ChangeRotate){lcd.cls();}
+                NMenuL1 = NMenuL2 + rotate;                         //Переменная для выбора параметра 
+                
+                printf("NMenuL1: %i\n", NMenuL1);
+                printf("NMenuL2: %i\n", NMenuL2);
+                switch (NMenuL1)                                    //Условие выбора параметра и дальнейшего возврата из меню на эту же строку уровня 1.
+                {
+                case 0: 
+                        lcd.locate(1, 0);                           //Расположение надписи следующей строки на дисплее (столбец, строка)
+                        lcd.printf("Lamp 1\n");                     //Надпись Lamp 1 и значение остатка ресурса для 1 лампы на 1 строке со второго символа
+                        lcd.locate(12, 0);                          //значение ресурса лампы (отводится 5 символов) на первойстроке с 12 символа
+                        lcd.printf("%i\n", L1Resusr_OSt);
+                        lcd.locate(1, 1);                           //Расположение надписи следующей строки на дисплее (столбец, строка)
+                        lcd.printf("Lamp 2\n");                     //Надпись Lamp 2 и значение остатка ресурса для 2 лампы на 2 строке со второго символа
+                        lcd.locate(12, 1);                          //значение ресурса лампы (отводится 5 символов) на первойстроке с 12 символа
+                        lcd.printf("%i\n", L2Resusr_OSt);
+
+                        Level1Back = false;
+                break;
+                case 1: 
+                        lcd.locate(1, 0);                           //Расположение надписи следующей строки на дисплее (столбец, строка)
+                        lcd.printf("Lamp 2\n");                     //Надпись Lamp 1 и значение остатка ресурса для 1 лампы на 1 строке со второго символа
+                        lcd.locate(12, 0);                          //значение ресурса лампы (отводится 5 символов) на первойстроке с 12 символа
+                        lcd.printf("%i\n", L2Resusr_OSt);
+                        lcd.locate(1, 1);
+                        lcd.printf("Lamp 3\n");
+                        Level1Back = false; 
+                break;
+                case 2: 
+                        lcd.locate(1, 0);
+                        lcd.printf("Lamp 3\n");
+                        lcd.locate(1, 1);
+                        lcd.printf("Lamp 4\n"); 
+                        Level1Back = false;
+                break;
+                case 3: 
+                        lcd.locate(1, 0);                              //Возврат на уровень выше (на уровень 0)
+                        lcd.printf("Back\n");
+                        Level1Back = true;                             //Условие возврата, а не перехода на уровень ниже
+                        if (button)                                    //по нажатию на кнопку происходит переход на уровень выше (0), сброс оборотов энкодера и очистка экрана
+                            {   
+                                NMenuL2 = 0;
+                                Level = 0;
+                                wheel.reset();
+                                lcd.cls();
+                            }
+                break;
+                default:                                                //После прокрутки всех параметров меню происходит возврат к началу 1 уровня
+
+                        lcd.locate(1, 0);                           //Расположение надписи следующей строки на дисплее (столбец, строка)
+                        lcd.printf("Lamp 1\n");                     //Надпись Lamp 1 и значение остатка ресурса для 1 лампы на 1 строке со второго символа
+                        lcd.locate(12, 0);                          //значение ресурса лампы (отводится 5 символов) на первойстроке с 12 символа
+                        lcd.printf("%i\n", L1Resusr_OSt);
+                        lcd.locate(1, 1);                           //Расположение надписи следующей строки на дисплее (столбец, строка)
+                        lcd.printf("Lamp 2\n");                     //Надпись Lamp 2 и значение остатка ресурса для 2 лампы на 2 строке со второго символа
+                        lcd.locate(12, 1);                          //значение ресурса лампы (отводится 5 символов) на первойстроке с 12 символа
+                        lcd.printf("%i\n", L2Resusr_OSt);
+
+                        Level1Back = false;
+                        NMenuL1 = 0;
+                        NMenuL2 = 0;
+                        wheel.reset();
+                break;
+                }
+            }   
+    }
+
+void Level2(int Level2Tout)                      //перемещение во 2 уровне
+    {
+        if (Level == 2)
+        {
+            
+            if (ChangeRotate) 
+            { 
+                lcd.cls();                         //при повороте энкодера происходит очистка дисплея
+                
+            }
+            
+            printf("NMenuL2 %i\n", NMenuL2);        //перемещение по меню уровня два (переменная для возврата на туже строку второго меню)
+            switch (NMenuL2)
+            {
+                case 0: /////////////////////////Управление первой лампой L1//////////////////////    
+                               (countB==0) ? NMenuL2_1 = CiclZnach(2, 0, rotate): NMenuL2_1 = NMenuL2_1;    //используем счетчик нажатий для активации параметров на уровне 2
+                                
+                                switch (NMenuL2_1)                                                          //перемещение в подменю второго уровня (параметры настройки)    
+                                    {
+                                    case 0: 
+                                                    if (countB == 0)
+                                                        {
+                                                        lcd.locate(1, 0);
+                                                        lcd.printf("L1:resurs %i\n", L1Resurs_St);                   //Начальное значение ресурса лампы 1
+                                                        lcd.locate(1, 1);
+                                                        lcd.printf("L1:reset\n");                                    //Сброс вычитаемого ресурса (значение остаточного ресурса вновь начнется с начального значения)
+                                                        }
+                                                    if (countB == 1)
+                                                        {
+
+                                                        ActMenuL2 = CiclZnach(1, 0, rotate);
+                                                        printf("ActMenuL2 %i\n", ActMenuL2);
+                                                            if (ActMenuL2==0)
+                                                                {
+                                                                    lcd.locate(1, 0);
+                                                                    lcd.printf("L1:r_st  %i\n", L1Resurs_St);   //
+                                                                    lcd.locate(1, 1);
+                                                                    lcd.printf("L1:back\n");                                           
+                                                                }
+                                                                    else 
+                                                                    {
+                                                                        lcd.locate(1, 0);
+                                                                        lcd.printf("L1:back\n");
+                                                                        lcd.locate(1, 1);
+                                                                        lcd.printf("L1:r_st  %i\n", L1Resurs_St);
+                                                                    }
+                                                        }
+                                                        else if (countB == 2)                                              //Подуровень изменяемого значения ресурса
+                                                            {
+                                                                ActMenuL2 = ActMenuL2;
+                                                                printf("ActMenuL2_2 %i\n", ActMenuL2);
+                                                                if (ActMenuL2==0)
+                                                                {
+                                                                    L1Resurs_Set = rotate;                                 //вводимое значение устанавливается поворотом энкодера
+                                                                    lcd.locate(1, 0);
+                                                                    lcd.printf("L1:r_set_  %i\n", L1Resurs_Set);            //отображение заданного значения ресурса лампы
+                                                                }
+                                                                    else 
+                                                                    {
+                                                                        countB = 0;                                         //после ввода значения счетчик нажатий сбрасывается в 0 и обороты энкодера также сбрасываются, 
+                                                                        wheel.reset();                                      //происходит возврад в подменю настройки лампы
+                                                                    }
+                                                                
+                                                            }
+                                                        else if (countB == 3)                                               //Подтверждение введеного значения ресурса лампы
+                                                            {
+                                                                if (L1Resurs_St!=L1Resurs_Set)                               //Если введеное значение отличается от того, что было
+                                                                    {                                                        //то переменной присваивается новое значение, иначе ничего
+                                                                    L1Resurs_St=L1Resurs_Set;                                //не изменится, просто пройдет возврат к предыдущему подменю
+                                                                    L1Resusr_OSt=L1Resurs_St;
+                                                                    countB = 0;
+                                                                    wheel.reset();
+                                                                    }
+                                                                    else {
+                                                                        countB = 0;
+                                                                        wheel.reset();
+                                                                    }
+                                                                if (backL2_1 == 1)                                            //возврат к предыдущему подменю
+                                                                    {
+                                                                     countB = 0; 
+                                                                     backL2_1 = 0;   
+                                                                    }
+                                                            }    
+
+                            
+                                        break;
+                                    case 1: lcd.locate(1, 0);
+                                            lcd.printf("L1: reset\n");
+                                            lcd.locate(1, 1);
+                                            lcd.printf("L1: back\n");
+                                                if (button) 
+                                                    {
+                                                        Level = 1;
+                                                        L1Resusr_OSt=L1Resurs_St;
+                                                        wheel.reset();
+                                                        lcd.cls();
+                                                    }
+                                        break;
+                                    case 2: lcd.locate(1, 0);
+                                            lcd.printf("L1: back\n");
+                                            lcd.locate(1, 1);
+                                            lcd.printf("L1: resurs %i\n", L1Resurs_St);
+                                                if (button) 
+                                                    {
+                                                        Level = 1;
+                                                        //NMenuL1 = NMenuL2;
+                                                        wheel.reset();
+                                                        lcd.cls();
+                                                    }
+                                        break;
+
+                                    default:
+                                            
+                                        break;
+                                }   
+                break;
+                case 1: /////////////////////////Управление второй лампой L2//////////////////////                                                           
+                        (countB==0) ? NMenuL2_1 = CiclZnach(2, 0, rotate): NMenuL2_1 = NMenuL2_1;
+                                
+                                switch (NMenuL2_1)
+                                    {
+                                    case 0: 
+                                            if (countB == 0)
+                                                {
+                                                lcd.locate(1, 0);
+                                                lcd.printf("L2:resurs %i\n", L2Resurs_St);
+                                                lcd.locate(1, 1);
+                                                lcd.printf("L2:reset\n");
+                                                }
+                                                    if (countB == 1)
+                                                        {
+
+                                                        ActMenuL2 = CiclZnach(1, 0, rotate);
+                                                        //printf("ActMenuL2 %i\n", ActMenuL2);
+                                                            if (ActMenuL2==0)
+                                                                {
+                                                                    lcd.locate(1, 0);
+                                                                    lcd.printf("L2:r_st  %i\n", L2Resurs_St);
+                                                                    lcd.locate(1, 1);
+                                                                    lcd.printf("L2:back\n");                                           
+                                                                }
+                                                                    else 
+                                                                    {
+                                                                        lcd.locate(1, 0);
+                                                                        lcd.printf("L2:back\n");
+                                                                        lcd.locate(1, 1);
+                                                                        lcd.printf("L2:r_st  %i\n", L2Resurs_St);
+                                                                    }
+                                                        }
+                                                        else if (countB == 2)       
+                                                            {
+                                                                ActMenuL2 = ActMenuL2;
+                                                                printf("ActMenuL2_2 %i\n", ActMenuL2);
+                                                                if (ActMenuL2==0)
+                                                                {
+                                                                    L2Resurs_Set = rotate;
+                                                                    lcd.locate(1, 0);
+                                                                    lcd.printf("L2:r_set  %i\n", L2Resurs_Set);
+                                                                }
+                                                                    else 
+                                                                    {
+                                                                        countB = 0;
+                                                                        wheel.reset();
+                                                                    }
+                                                                
+                                                            }
+                                                        else if (countB == 3)
+                                                            {
+                                                                if (L2Resurs_St!=L2Resurs_Set)
+                                                                    {
+                                                                    L2Resurs_St=L2Resurs_Set;
+                                                                    L2Resusr_OSt=L2Resurs_St;
+                                                                    countB = 0;
+                                                                    wheel.reset();
+                                                                    }
+                                                                if (backL2_1 == 1)
+                                                                    {
+                                                                     countB = 0; 
+                                                                     backL2_1 = 0;   
+                                                                    }
+                                                            }    
+
+                            
+                                        break;
+                                    case 1: lcd.locate(1, 0);
+                                            lcd.printf("L2: reset\n");
+                                            lcd.locate(1, 1);
+                                            lcd.printf("L2: back\n");
+                                                if (button) 
+                                                    {
+                                                        Level = 1;
+                                                        L2Resusr_OSt=L2Resurs_St;
+                                                        wheel.reset();
+                                                        lcd.cls();
+                                                    }
+                                        break;
+                                    case 2: lcd.locate(1, 0);
+                                            lcd.printf("L2: back\n");
+                                            lcd.locate(1, 1);
+                                            lcd.printf("L2: resurs %i\n", L2Resurs_St);
+                                                if (button) 
+                                                    {
+                                                        Level = 1;
+                                                        //NMenuL1 = NMenuL2;
+                                                        wheel.reset();
+                                                        lcd.cls();
+                                                    }
+                                        break;
+
+                                    default:
+                                            
+                                        break;
+                                }   
+                break;
+                case 2:
+                         switch (rotate)
+                        {
+                        case 0: lcd.locate(1, 0);
+                                 lcd.printf("L3: resurs\n");
+                                 lcd.locate(1, 1);
+                                 lcd.printf("L3: restart\n");
+                            break;
+                        case 1: lcd.locate(1, 0);
+                                 lcd.printf("L3: restart\n");
+                                 lcd.locate(1, 1);
+                                 lcd.printf("L3: back\n");
+                            break;
+                        case 2: lcd.locate(1, 0);
+                                 lcd.printf("L3: back\n");
+                                 lcd.locate(1, 1);
+                                 lcd.printf("L3: resurs\n");
+                                    if (button) 
+                                        {
+                                            Level = 1;
+                                            //NMenuL1 = NMenuL2;
+                                            wheel.reset();
+                                            lcd.cls();
+                                        }
+                            break;
+
+                        default:
+                                lcd.locate(1, 0);
+                                 lcd.printf("L3: resurs\n");
+                                 lcd.locate(1, 1);
+                                 lcd.printf("L3: restart\n");
+                                 wheel.reset();
+                            break;
+                        }  
+                    break;     
+                default:
+                         switch (rotate)
+                        {
+                            case 0: lcd.locate(1, 0);
+                                    lcd.printf("L1: resurs\n");
+                                    lcd.locate(1, 1);
+                                    lcd.printf("L1: restart\n");
+                                break;
+                            case 1: lcd.locate(1, 0);
+                                    lcd.printf("L1: restart\n");
+                                    lcd.locate(1, 1);
+                                    lcd.printf("L1: back\n");
+                                break;
+                            case 2: lcd.locate(1, 0);
+                                    lcd.printf("L1: back\n");
+                                    lcd.locate(1, 1);
+                                    lcd.printf("L1: resurs\n");
+                                        if (button) 
+                                            {
+                                                Level = 1;
+                                                //NMenuL1 = NMenuL2;
+                                                wheel.reset();
+                                                lcd.cls();
+                                            }
+                                break;
+
+                            default:
+                                    lcd.locate(1, 0);
+                                    lcd.printf("L1: resurs\n");
+                                    lcd.locate(1, 1);
+                                    lcd.printf("L1: restart\n");
+                                    //wheel.reset();
+                                break;
+                        }   
+                    break;
+            }
+        }   
+    }
+
+
+
+
+
+
