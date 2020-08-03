@@ -1,23 +1,5 @@
-
-
 #include "set.h"
 
-
-
-
-
-
-
-
-
-
-
-int OnOffint;//////////////удалить, это для теста!!!!!!!!!!!
-
-// //void Alarm(int AlarmT)
-//     {
-//         if
-//     }
 
 
 int main() 
@@ -25,6 +7,7 @@ int main()
     t.start();                                          //включение библиотеки системного времени (библиотека Times)
     //lcd.printf("Obsh T: %i\n", Sec);
     //lcd.printf("Work T: %i\n", Min);
+    
 
     while(1)
     {

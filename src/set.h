@@ -25,30 +25,35 @@ RPG wheelRPG (PB_6,PB_7,PC_13);
 I2C i2c_lcd( I2C_SDA,I2C_SCL); // I2C_SDA, I2C_SCL
 TextLCD_I2C lcd(&i2c_lcd, 0x4E, TextLCD_I2C::LCD16x2,TextLCD::HD44780);
 
-Lamp lamp1;
-Lamp lamp2;
-Lamp lamp3;
-Lamp lamp4;
-Lamp lamp5;
-Lamp lamp6;
-Lamp lamp7;
-Lamp lamp8;
-Lamp lamp9;
-Lamp lamp10;
-Lamp lamp11;
-Lamp lamp12;
-Lamp lamp13;
-Lamp lamp14;
-Lamp lamp15;
-Lamp lamp16;
-Lamp lamp17;
-Lamp lamp18;
-Lamp lamp19;
-Lamp lamp20;
-Lamp lamp21;
-Lamp lamp22;
-Lamp lamp23;
-Lamp lamp24;
+int ListLamp=24; // Колличество ламп в установке
+Lamp LampArray[ListLamp];
+
+// Lamp lamp1;
+// Lamp lamp2;
+// Lamp lamp3;
+// Lamp lamp4;
+// Lamp lamp5;
+// Lamp lamp6;
+// Lamp lamp7;
+// Lamp lamp8;
+// Lamp lamp9;
+// Lamp lamp10;
+// Lamp lamp11;
+// Lamp lamp12;
+// Lamp lamp13;
+// Lamp lamp14;
+// Lamp lamp15;
+// Lamp lamp16;
+// Lamp lamp17;
+// Lamp lamp18;
+// Lamp lamp19;
+// Lamp lamp20;
+// Lamp lamp21;
+// Lamp lamp22;
+// Lamp lamp23;
+// Lamp lamp24;
+
+
 
 
 
