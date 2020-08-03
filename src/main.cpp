@@ -7,7 +7,7 @@ QEI wheel (PB_6,PB_7,PC_13, 24); //(pinA, pinB, button, countobor)
 RPG wheelRPG (PB_6,PB_7,PC_13);
 I2C i2c_lcd( I2C_SDA,I2C_SCL); // I2C_SDA, I2C_SCL
 TextLCD_I2C lcd(&i2c_lcd, 0x4E, TextLCD_I2C::LCD16x2,TextLCD::HD44780);
-
+//
 //---переменые энкодера для использования в программе----
 uint16_t    rotate;                             //количество проворотов энкодера    
 bool        button;                             //нажатие на кнопку (импульс)   
