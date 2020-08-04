@@ -7,8 +7,8 @@ int main()
     t.start();                                          //включение библиотеки системного времени (библиотека Times)
     //lcd.printf("Obsh T: %i\n", Sec);
     //lcd.printf("Work T: %i\n", Min);
-    
-
+    //LampNumber[0].Lamp();
+    LampNumber[0].LampResurs_Set=10;
     while(1)
     {
         

@@ -14,9 +14,8 @@ class Lamp
     public:
     Lamp() //Конструктор по умолчанию (без параметров)
     {
-      // LampNumber=LampResurs_St=LampResurs_Set=LampResusr_Res=LampResusr_OSt=0;
+       //LampNumber=LampResurs_St=LampResurs_Set=LampResusr_Res=LampResusr_OSt=0;
     }
-    int LampNumber;
     int LampResurs_St;                                 //Ресурсное время лампы 1   
     int LampResurs_Set;                                //Ручное выставление ресурсного вермени лампы 1   
     int LampResusr_Res;                                //Сброс отработанного времени на выставленное лампы 1 

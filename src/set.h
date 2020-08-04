@@ -25,8 +25,9 @@ RPG wheelRPG (PB_6,PB_7,PC_13);
 I2C i2c_lcd( I2C_SDA,I2C_SCL); // I2C_SDA, I2C_SCL
 TextLCD_I2C lcd(&i2c_lcd, 0x4E, TextLCD_I2C::LCD16x2,TextLCD::HD44780);
 
-int ListLamp=24; // Колличество ламп в установке
-Lamp LampArray[ListLamp];
+const int COUNTLAMP=24; // Колличество ламп в установке
+
+Lamp LampNumber[COUNTLAMP]; 
 
 // Lamp lamp1;
 // Lamp lamp2;
@@ -118,6 +119,7 @@ int L2Resusr_OSt;                                //оставшееся врем
 bool L1_Alarm;                                   //предупреждение об окончании ресурса лампы 1
 int L1_AlarmT;                                   //Остаток времени, меньше которого появится предупреждение  
 
+int OnOffint;
 
        
 
