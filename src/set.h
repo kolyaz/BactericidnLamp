@@ -242,8 +242,14 @@ void ResursT (int ResursTime)                   // Ресурсное время
                 
                 if (TikTimeR)
                     {
-                        (L1Resusr_OSt > 0) ? L1Resusr_OSt--: L1Resusr_OSt = L1Resusr_OSt;       //Уменьшение ресурса по времени для лампы 1
-                        (L2Resusr_OSt > 0) ? L2Resusr_OSt--: L2Resusr_OSt = L2Resusr_OSt;       //Уменьшение ресурса по времени для лампы 2
+                        
+                        for (size_t i = 0; i < COUNTLAMP; i++)
+                        {
+                            (LampNumaber[i].LampResusr_OSt > 0) ? LampNumaber[i].LampResusr_OSt--: LampNumaber[i].LampResusr_OSt = LampNumaber[i].LampResusr_OSt;
+                        }
+                        
+                        // (L1Resusr_OSt > 0) ? L1Resusr_OSt--: L1Resusr_OSt = L1Resusr_OSt;       //Уменьшение ресурса по времени для лампы 1
+                        // (L2Resusr_OSt > 0) ? L2Resusr_OSt--: L2Resusr_OSt = L2Resusr_OSt;       //Уменьшение ресурса по времени для лампы 2
                     }
                 TimeOldR = Sec;
                  }
