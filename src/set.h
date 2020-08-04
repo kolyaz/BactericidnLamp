@@ -31,7 +31,37 @@ Lamp LampNumber[COUNTLAMP];  // Массив класса ламп (24 т.к. м
 
 
 
-//
+
+
+//// Выходы ламп
+
+DigitalInOut Stat_Lamp_0(PC_0); 
+DigitalInOut Stat_Lamp_1(PC_1);
+DigitalInOut Stat_Lamp_2(PC_2);
+DigitalInOut Stat_Lamp_3(PC_3);
+DigitalInOut Stat_Lamp_4(PA_2);
+DigitalInOut Stat_Lamp_5(PA_3);
+DigitalInOut Stat_Lamp_6(PA_4);
+DigitalInOut Stat_Lamp_7(PA_5);
+DigitalInOut Stat_Lamp_8(PA_6);
+DigitalInOut Stat_Lamp_9(PA_7);
+DigitalInOut Stat_Lamp_10(PC_4);
+DigitalInOut Stat_Lamp_11(PC_5);
+DigitalInOut Stat_Lamp_12(PB_0);
+DigitalInOut Stat_Lamp_13(PB_1);
+DigitalInOut Stat_Lamp_14(PB_2);
+DigitalInOut Stat_Lamp_15(PB_13);
+DigitalInOut Stat_Lamp_16(PB_14);
+DigitalInOut Stat_Lamp_17(PB_15);
+DigitalInOut Stat_Lamp_18(PC_6);
+DigitalInOut Stat_Lamp_19(PC_7);
+DigitalInOut Stat_Lamp_20(PC_8);
+DigitalInOut Stat_Lamp_21(PC_9);
+DigitalInOut Stat_Lamp_22(PA_8);
+DigitalInOut Stat_Lamp_23(PA_9);
+
+
+
 //---переменые энкодера для использования в программе----
 uint16_t    rotate;                             //количество проворотов энкодера    
 bool        button;                             //нажатие на кнопку (импульс)   
@@ -98,6 +128,36 @@ int OnOffint;
 
         //////////////////////////////////////Функции////////////////////////////////////////
 
+void OutInit()
+{
+  
+  Stat_Lamp_0=LampNumber[0].LampPinOut;
+  Stat_Lamp_1=LampNumber[1].LampPinOut;
+  Stat_Lamp_2=LampNumber[2].LampPinOut;
+  Stat_Lamp_3=LampNumber[3].LampPinOut;
+  Stat_Lamp_4=LampNumber[4].LampPinOut;
+  Stat_Lamp_5=LampNumber[5].LampPinOut;
+  Stat_Lamp_6=LampNumber[6].LampPinOut;
+  Stat_Lamp_7=LampNumber[7].LampPinOut;
+  Stat_Lamp_8=LampNumber[8].LampPinOut;
+  Stat_Lamp_9=LampNumber[9].LampPinOut;
+  Stat_Lamp_10=LampNumber[10].LampPinOut;
+  Stat_Lamp_11=LampNumber[11].LampPinOut;
+  Stat_Lamp_12=LampNumber[12].LampPinOut;
+  Stat_Lamp_13=LampNumber[13].LampPinOut;
+  Stat_Lamp_14=LampNumber[14].LampPinOut;
+  Stat_Lamp_15=LampNumber[15].LampPinOut;
+  Stat_Lamp_16=LampNumber[16].LampPinOut;
+  Stat_Lamp_17=LampNumber[17].LampPinOut;
+  Stat_Lamp_18=LampNumber[18].LampPinOut;
+  Stat_Lamp_19=LampNumber[19].LampPinOut;
+  Stat_Lamp_20=LampNumber[20].LampPinOut;
+  Stat_Lamp_21=LampNumber[21].LampPinOut;
+  Stat_Lamp_22=LampNumber[22].LampPinOut;
+  Stat_Lamp_23=LampNumber[23].LampPinOut;
+
+}
+
 //-------------------------------------------------------------------Функция чтения циклического значения в определенных пределах
 int8_t CiclZnach (int8_t UpPredel, int8_t DnPredel, int16_t rotateCZ)       
 {
@@ -111,7 +171,7 @@ int8_t CiclZnach (int8_t UpPredel, int8_t DnPredel, int16_t rotateCZ)
            return rotateCZ;
 }
 //------------------------------------------------------------------
-
+DigitalInOut r(PC_0);
 
 //------------------------------------------------------------------Функция для формирования импульса для различных промежутком времени
 bool TikTime (int TimePrOld, int TimePr)                                   
