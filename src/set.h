@@ -230,7 +230,7 @@ void ResursT (int ResursTime)                   // Ресурсное время
             {
               for (size_t i = 0; i < COUNTLAMP; i++)
               {
-                  (LampNumaber[i].LampResusr_OSt > 0) ? LampNumaber[i].LampResusr_OSt = LampNumaber[i].LampResusr_OSt - KoefOnOffRes: LampNumaber[i].LampResusr_OSt = LampNumaber[i].LampResusr_OSt;
+                  (LampNumber[i].LampResusr_OSt > 0) ? LampNumber[i].LampResusr_OSt = LampNumber[i].LampResusr_OSt - KoefOnOffRes: LampNumber[i].LampResusr_OSt = LampNumber[i].LampResusr_OSt;
               }
               //(L1Resusr_OSt > 0) ? L1Resusr_OSt = L1Resusr_OSt - KoefOnOffRes: L1Resusr_OSt = L1Resusr_OSt;
               //(L2Resusr_OSt > 0) ? L2Resusr_OSt = L2Resusr_OSt - KoefOnOffRes: L2Resusr_OSt = L2Resusr_OSt;
@@ -245,7 +245,7 @@ void ResursT (int ResursTime)                   // Ресурсное время
                         
                         for (size_t i = 0; i < COUNTLAMP; i++)
                         {
-                            (LampNumaber[i].LampResusr_OSt > 0) ? LampNumaber[i].LampResusr_OSt--: LampNumaber[i].LampResusr_OSt = LampNumaber[i].LampResusr_OSt;
+                            (LampNumber[i].LampResusr_OSt > 0) ? LampNumber[i].LampResusr_OSt--: LampNumber[i].LampResusr_OSt = LampNumber[i].LampResusr_OSt;
                         }
                         
                         // (L1Resusr_OSt > 0) ? L1Resusr_OSt--: L1Resusr_OSt = L1Resusr_OSt;       //Уменьшение ресурса по времени для лампы 1
@@ -324,70 +324,83 @@ void Level1(int Level1Tout)                     //перемещение в 1 у
     {
         if (Level==1)
             {
-                if (ChangeRotate){lcd.cls();}
+                if (ChangeRotate)
+                {
+                    lcd.cls();
+                }
                 NMenuL1 = NMenuL2 + rotate;                         //Переменная для выбора параметра 
                 
                 printf("NMenuL1: %i\n", NMenuL1);
                 printf("NMenuL2: %i\n", NMenuL2);
-                switch (NMenuL1)                                    //Условие выбора параметра и дальнейшего возврата из меню на эту же строку уровня 1.
-                {
-                case 0: 
-                        lcd.locate(1, 0);                           //Расположение надписи следующей строки на дисплее (столбец, строка)
-                        lcd.printf("Lamp 1\n");                     //Надпись Lamp 1 и значение остатка ресурса для 1 лампы на 1 строке со второго символа
-                        lcd.locate(12, 0);                          //значение ресурса лампы (отводится 5 символов) на первойстроке с 12 символа
-                        lcd.printf("%i\n", L1Resusr_OSt);
-                        lcd.locate(1, 1);                           //Расположение надписи следующей строки на дисплее (столбец, строка)
-                        lcd.printf("Lamp 2\n");                     //Надпись Lamp 2 и значение остатка ресурса для 2 лампы на 2 строке со второго символа
-                        lcd.locate(12, 1);                          //значение ресурса лампы (отводится 5 символов) на первойстроке с 12 символа
-                        lcd.printf("%i\n", L2Resusr_OSt);
+                lcd.locate(1, 0);                           //Расположение надписи следующей строки на дисплее (столбец, строка)
+                lcd.printf("Lamp "+ "%i\n",NMenuL1+1);                     //Надпись Lamp 1 и значение остатка ресурса для 1 лампы на 1 строке со второго символа
+                lcd.locate(12, 0);                          //значение ресурса лампы (отводится 5 символов) на первойстроке с 12 символа
+                lcd.printf("%i\n", LampNumber.LampResusr_OSt[NMenuL1]);
+                lcd.locate(1, 1);                           //Расположение надписи следующей строки на дисплее (столбец, строка)
+                lcd.printf("Lamp "+"%i\n",NMenuL1+2);                     //Надпись Lamp 2 и значение остатка ресурса для 2 лампы на 2 строке со второго символа
+                lcd.locate(12, 1);                          //значение ресурса лампы (отводится 5 символов) на первойстроке с 12 символа
+                lcd.printf("%i\n", LampNumber.LampResusr_OSt[NMenuL1+1]);
 
-                        Level1Back = false;
-                break;
-                case 1: 
-                        lcd.locate(1, 0);                           //Расположение надписи следующей строки на дисплее (столбец, строка)
-                        lcd.printf("Lamp 2\n");                     //Надпись Lamp 1 и значение остатка ресурса для 1 лампы на 1 строке со второго символа
-                        lcd.locate(12, 0);                          //значение ресурса лампы (отводится 5 символов) на первойстроке с 12 символа
-                        lcd.printf("%i\n", L2Resusr_OSt);
-                        lcd.locate(1, 1);
-                        lcd.printf("Lamp 3\n");
-                        Level1Back = false; 
-                break;
-                case 2: 
-                        lcd.locate(1, 0);
-                        lcd.printf("Lamp 3\n");
-                        lcd.locate(1, 1);
-                        lcd.printf("Lamp 4\n"); 
-                        Level1Back = false;
-                break;
-                case 3: 
-                        lcd.locate(1, 0);                              //Возврат на уровень выше (на уровень 0)
-                        lcd.printf("Back\n");
-                        Level1Back = true;                             //Условие возврата, а не перехода на уровень ниже
-                        if (button)                                    //по нажатию на кнопку происходит переход на уровень выше (0), сброс оборотов энкодера и очистка экрана
-                            {   
-                                NMenuL2 = 0;
-                                Level = 0;
-                                wheel.reset();
-                                lcd.cls();
-                            }
-                break;
-                default:                                                //После прокрутки всех параметров меню происходит возврат к началу 1 уровня
+                //         Level1Back = false;
+                // switch (NMenuL1)                                    //Условие выбора параметра и дальнейшего возврата из меню на эту же строку уровня 1.
+                // {
+                // case 0: 
+                //         lcd.locate(1, 0);                           //Расположение надписи следующей строки на дисплее (столбец, строка)
+                //         lcd.printf("Lamp 1\n");                     //Надпись Lamp 1 и значение остатка ресурса для 1 лампы на 1 строке со второго символа
+                //         lcd.locate(12, 0);                          //значение ресурса лампы (отводится 5 символов) на первойстроке с 12 символа
+                //         lcd.printf("%i\n", L1Resusr_OSt);
+                //         lcd.locate(1, 1);                           //Расположение надписи следующей строки на дисплее (столбец, строка)
+                //         lcd.printf("Lamp 2\n");                     //Надпись Lamp 2 и значение остатка ресурса для 2 лампы на 2 строке со второго символа
+                //         lcd.locate(12, 1);                          //значение ресурса лампы (отводится 5 символов) на первойстроке с 12 символа
+                //         lcd.printf("%i\n", L2Resusr_OSt);
 
-                        lcd.locate(1, 0);                           //Расположение надписи следующей строки на дисплее (столбец, строка)
-                        lcd.printf("Lamp 1\n");                     //Надпись Lamp 1 и значение остатка ресурса для 1 лампы на 1 строке со второго символа
-                        lcd.locate(12, 0);                          //значение ресурса лампы (отводится 5 символов) на первойстроке с 12 символа
-                        lcd.printf("%i\n", L1Resusr_OSt);
-                        lcd.locate(1, 1);                           //Расположение надписи следующей строки на дисплее (столбец, строка)
-                        lcd.printf("Lamp 2\n");                     //Надпись Lamp 2 и значение остатка ресурса для 2 лампы на 2 строке со второго символа
-                        lcd.locate(12, 1);                          //значение ресурса лампы (отводится 5 символов) на первойстроке с 12 символа
-                        lcd.printf("%i\n", L2Resusr_OSt);
+                //         Level1Back = false;
+                // break;
+                // case 1: 
+                //         lcd.locate(1, 0);                           //Расположение надписи следующей строки на дисплее (столбец, строка)
+                //         lcd.printf("Lamp 2\n");                     //Надпись Lamp 1 и значение остатка ресурса для 1 лампы на 1 строке со второго символа
+                //         lcd.locate(12, 0);                          //значение ресурса лампы (отводится 5 символов) на первойстроке с 12 символа
+                //         lcd.printf("%i\n", L2Resusr_OSt);
+                //         lcd.locate(1, 1);
+                //         lcd.printf("Lamp 3\n");
+                //         Level1Back = false; 
+                // break;
+                // case 2: 
+                //         lcd.locate(1, 0);
+                //         lcd.printf("Lamp 3\n");
+                //         lcd.locate(1, 1);
+                //         lcd.printf("Lamp 4\n"); 
+                //         Level1Back = false;
+                // break;
+                // case 3: 
+                //         lcd.locate(1, 0);                              //Возврат на уровень выше (на уровень 0)
+                //         lcd.printf("Back\n");
+                //         Level1Back = true;                             //Условие возврата, а не перехода на уровень ниже
+                //         if (button)                                    //по нажатию на кнопку происходит переход на уровень выше (0), сброс оборотов энкодера и очистка экрана
+                //             {   
+                //                 NMenuL2 = 0;
+                //                 Level = 0;
+                //                 wheel.reset();
+                //                 lcd.cls();
+                //             }
+                // break;
+                // default:                                                //После прокрутки всех параметров меню происходит возврат к началу 1 уровня
 
-                        Level1Back = false;
-                        NMenuL1 = 0;
-                        NMenuL2 = 0;
-                        wheel.reset();
-                break;
-                }
+                //         lcd.locate(1, 0);                           //Расположение надписи следующей строки на дисплее (столбец, строка)
+                //         lcd.printf("Lamp 1\n");                     //Надпись Lamp 1 и значение остатка ресурса для 1 лампы на 1 строке со второго символа
+                //         lcd.locate(12, 0);                          //значение ресурса лампы (отводится 5 символов) на первойстроке с 12 символа
+                //         lcd.printf("%i\n", L1Resusr_OSt);
+                //         lcd.locate(1, 1);                           //Расположение надписи следующей строки на дисплее (столбец, строка)
+                //         lcd.printf("Lamp 2\n");                     //Надпись Lamp 2 и значение остатка ресурса для 2 лампы на 2 строке со второго символа
+                //         lcd.locate(12, 1);                          //значение ресурса лампы (отводится 5 символов) на первойстроке с 12 символа
+                //         lcd.printf("%i\n", L2Resusr_OSt);
+
+                //         Level1Back = false;
+                //         NMenuL1 = 0;
+                //         NMenuL2 = 0;
+                //         wheel.reset();
+                // break;
+                // }
             }   
     }
 
