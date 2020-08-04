@@ -13,7 +13,7 @@
 
 
 
-#include "fun.h"
+
 #include  "lamp.cpp"
 
 
@@ -27,34 +27,7 @@ TextLCD_I2C lcd(&i2c_lcd, 0x4E, TextLCD_I2C::LCD16x2,TextLCD::HD44780);
 
 const int COUNTLAMP=24; // Колличество ламп в установке
 
-Lamp LampNumber[COUNTLAMP]; 
-
-// Lamp lamp1;
-// Lamp lamp2;
-// Lamp lamp3;
-// Lamp lamp4;
-// Lamp lamp5;
-// Lamp lamp6;
-// Lamp lamp7;
-// Lamp lamp8;
-// Lamp lamp9;
-// Lamp lamp10;
-// Lamp lamp11;
-// Lamp lamp12;
-// Lamp lamp13;
-// Lamp lamp14;
-// Lamp lamp15;
-// Lamp lamp16;
-// Lamp lamp17;
-// Lamp lamp18;
-// Lamp lamp19;
-// Lamp lamp20;
-// Lamp lamp21;
-// Lamp lamp22;
-// Lamp lamp23;
-// Lamp lamp24;
-
-
+Lamp LampNumber[COUNTLAMP-1];  // Массив ламп (-1 т.к. массив начинается с 0)
 
 
 
@@ -193,7 +166,7 @@ void TimerObsh (int TimerSec,Timer &t)
 void drebezg_encoder (int dredezg)              
 
 {
-    wait_ms(dredezg);                                                 //испрльзование задержки для исключения дребезга      
+    wait_ms(dredezg);                                                 //использование задержки для исключения дребезга      
     uint16_t    rotateNew=wheel.getPulses();                          //Чтенеие поворотов энкодера. библиотека OEI  
     bool        buttonRPG=wheelRPG.pb();                              //Чтение "кнопочного" сигнала энкодера. библиотека RPG  
         ChangeRotate = (rotate!=rotateNew) ? true : false;            //Чтение поворота энкодера без проскальзывания
@@ -255,8 +228,12 @@ void ResursT (int ResursTime)                   // Ресурсное время
    {                                                                                   //стандартный ресурс (почасовой)
         if (!OnOffRes)                                                                 //импульс включения и вычета коэффициента от ресурса                 
             {
-              (L1Resusr_OSt > 0) ? L1Resusr_OSt = L1Resusr_OSt - KoefOnOffRes: L1Resusr_OSt = L1Resusr_OSt;
-              (L2Resusr_OSt > 0) ? L2Resusr_OSt = L2Resusr_OSt - KoefOnOffRes: L2Resusr_OSt = L2Resusr_OSt;
+              for (size_t i = 0; i < COUNTLAMP; i++)
+              {
+                  (LampNumaber[i].LampResusr_OSt > 0) ? LampNumaber[i].LampResusr_OSt = LampNumaber[i].LampResusr_OSt - KoefOnOffRes: LampNumaber[i].LampResusr_OSt = LampNumaber[i].LampResusr_OSt;
+              }
+              //(L1Resusr_OSt > 0) ? L1Resusr_OSt = L1Resusr_OSt - KoefOnOffRes: L1Resusr_OSt = L1Resusr_OSt;
+              //(L2Resusr_OSt > 0) ? L2Resusr_OSt = L2Resusr_OSt - KoefOnOffRes: L2Resusr_OSt = L2Resusr_OSt;
               OnOffRes = true;  
             }
             else 
