@@ -4,7 +4,7 @@
 
 int main() 
 {   
-    t.start();                                          //включение библиотеки системного времени (библиотека Times)
+    t.start();                                          //включение библиотеки системного времени (библиотека Times)////tthffgt
     //lcd.printf("Obsh T: %i\n", Sec);
     //lcd.printf("Work T: %i\n", Min);
     //LampNumber[0].Lamp();
