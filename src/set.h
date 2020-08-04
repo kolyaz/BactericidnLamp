@@ -329,17 +329,38 @@ void Level1(int Level1Tout)                     //перемещение в 1 у
                     lcd.cls();
                 }
                 NMenuL1 = NMenuL2 + rotate;                         //Переменная для выбора параметра 
+                if (NMenuL1<COUNTLAMP)
+                {
+                    printf("NMenuL1: %i\n", NMenuL1);
+                    printf("NMenuL2: %i\n", NMenuL2);
+                    lcd.locate(1, 0);                           //Расположение надписи следующей строки на дисплее (столбец, строка)
+                    lcd.printf("Lamp %i\n",NMenuL1+1);                     //Надпись Lamp 1 и значение остатка ресурса для 1 лампы на 1 строке со второго символа
+                    lcd.locate(12, 0);                          //значение ресурса лампы (отводится 5 символов) на первойстроке с 12 символа
+                    lcd.printf("%i\n", LampNumber[NMenuL1].LampResusr_OSt);
+                    if (NMenuL1<(COUNTLAMP-1))
+                    {
+                        lcd.locate(1, 1);                           //Расположение надписи следующей строки на дисплее (столбец, строка)
+                        lcd.printf("Lamp %i\n",NMenuL1+2);                     //Надпись Lamp 2 и значение остатка ресурса для 2 лампы на 2 строке со второго символа
+                        lcd.locate(12, 1);                          //значение ресурса лампы (отводится 5 символов) на первойстроке с 12 символа
+                        lcd.printf("%i\n", LampNumber[NMenuL1+1].LampResusr_OSt);
+                    }
+                    Level1Back = false; 
+                }
+                else if (NMenuL1>COUNTLAMP)
+                {       wheel.setPulses;
+                        lcd.cls();
+                        lcd.locate(1, 0);                              //Возврат на уровень выше (на уровень 0)
+                        lcd.printf("Back\n");
+                        Level1Back = true;                             //Условие возврата, а не перехода на уровень ниже
+                        if (button)                                    //по нажатию на кнопку происходит переход на уровень выше (0), сброс оборотов энкодера и очистка экрана
+                            {   
+                                NMenuL2 = 0;
+                                Level = 0;
+                                wheel.reset();
+                                lcd.cls();
+                            }
+                }
                 
-                printf("NMenuL1: %i\n", NMenuL1);
-                printf("NMenuL2: %i\n", NMenuL2);
-                lcd.locate(1, 0);                           //Расположение надписи следующей строки на дисплее (столбец, строка)
-                lcd.printf("Lamp "+ "%i\n",NMenuL1+1);                     //Надпись Lamp 1 и значение остатка ресурса для 1 лампы на 1 строке со второго символа
-                lcd.locate(12, 0);                          //значение ресурса лампы (отводится 5 символов) на первойстроке с 12 символа
-                lcd.printf("%i\n", LampNumber.LampResusr_OSt[NMenuL1]);
-                lcd.locate(1, 1);                           //Расположение надписи следующей строки на дисплее (столбец, строка)
-                lcd.printf("Lamp "+"%i\n",NMenuL1+2);                     //Надпись Lamp 2 и значение остатка ресурса для 2 лампы на 2 строке со второго символа
-                lcd.locate(12, 1);                          //значение ресурса лампы (отводится 5 символов) на первойстроке с 12 символа
-                lcd.printf("%i\n", LampNumber.LampResusr_OSt[NMenuL1+1]);
 
                 //         Level1Back = false;
                 // switch (NMenuL1)                                    //Условие выбора параметра и дальнейшего возврата из меню на эту же строку уровня 1.
