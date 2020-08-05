@@ -131,30 +131,30 @@ int OnOffint;
 void OutInit()
 {
   
-  Stat_Lamp_0=LampNumber[0].LampPinOut;
-  Stat_Lamp_1=LampNumber[1].LampPinOut;
-  Stat_Lamp_2=LampNumber[2].LampPinOut;
-  Stat_Lamp_3=LampNumber[3].LampPinOut;
-  Stat_Lamp_4=LampNumber[4].LampPinOut;
-  Stat_Lamp_5=LampNumber[5].LampPinOut;
-  Stat_Lamp_6=LampNumber[6].LampPinOut;
-  Stat_Lamp_7=LampNumber[7].LampPinOut;
-  Stat_Lamp_8=LampNumber[8].LampPinOut;
-  Stat_Lamp_9=LampNumber[9].LampPinOut;
-  Stat_Lamp_10=LampNumber[10].LampPinOut;
-  Stat_Lamp_11=LampNumber[11].LampPinOut;
-  Stat_Lamp_12=LampNumber[12].LampPinOut;
-  Stat_Lamp_13=LampNumber[13].LampPinOut;
-  Stat_Lamp_14=LampNumber[14].LampPinOut;
-  Stat_Lamp_15=LampNumber[15].LampPinOut;
-  Stat_Lamp_16=LampNumber[16].LampPinOut;
-  Stat_Lamp_17=LampNumber[17].LampPinOut;
-  Stat_Lamp_18=LampNumber[18].LampPinOut;
-  Stat_Lamp_19=LampNumber[19].LampPinOut;
-  Stat_Lamp_20=LampNumber[20].LampPinOut;
-  Stat_Lamp_21=LampNumber[21].LampPinOut;
-  Stat_Lamp_22=LampNumber[22].LampPinOut;
-  Stat_Lamp_23=LampNumber[23].LampPinOut;
+//   Stat_Lamp_0=LampNumber[0].LampPinOut;
+//   Stat_Lamp_1=LampNumber[1].LampPinOut;
+//   Stat_Lamp_2=LampNumber[2].LampPinOut;
+//   Stat_Lamp_3=LampNumber[3].LampPinOut;
+//   Stat_Lamp_4=LampNumber[4].LampPinOut;
+//   Stat_Lamp_5=LampNumber[5].LampPinOut;
+//   Stat_Lamp_6=LampNumber[6].LampPinOut;
+//   Stat_Lamp_7=LampNumber[7].LampPinOut;
+//   Stat_Lamp_8=LampNumber[8].LampPinOut;
+//   Stat_Lamp_9=LampNumber[9].LampPinOut;
+//   Stat_Lamp_10=LampNumber[10].LampPinOut;
+//   Stat_Lamp_11=LampNumber[11].LampPinOut;
+//   Stat_Lamp_12=LampNumber[12].LampPinOut;
+//   Stat_Lamp_13=LampNumber[13].LampPinOut;
+//   Stat_Lamp_14=LampNumber[14].LampPinOut;
+//   Stat_Lamp_15=LampNumber[15].LampPinOut;
+//   Stat_Lamp_16=LampNumber[16].LampPinOut;
+//   Stat_Lamp_17=LampNumber[17].LampPinOut;
+//   Stat_Lamp_18=LampNumber[18].LampPinOut;
+//   Stat_Lamp_19=LampNumber[19].LampPinOut;
+//   Stat_Lamp_20=LampNumber[20].LampPinOut;
+//   Stat_Lamp_21=LampNumber[21].LampPinOut;
+//   Stat_Lamp_22=LampNumber[22].LampPinOut;
+//   Stat_Lamp_23=LampNumber[23].LampPinOut;
 
 }
 

@@ -18,7 +18,7 @@ class Lamp
     }
     int LampPinOut (PinName pin,int b ) //Иницианализация выхода
     {
-       LampOut=DigitalInOut(pin);// потом доделаю
+       //LampOut=DigitalInOut(pin);// потом доделаю
          
     }
     bool LampRead;                                   //Выход лампы
